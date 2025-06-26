@@ -74,6 +74,10 @@ class LegalAgentGraph:
         graph.add_node("router", self._route_query)
         graph.add_node("constitutional_agent", self._constitutional_handler)
         graph.add_node("criminal_agent", self._criminal_handler)
+        graph.add_node("civil_agent", self._civil_handler)
+        graph.add_node("corporate_agent", self._corporate_handler)
+        graph.add_node("family_agent", self._family_handler)
+        graph.add_node("tax_agent", self._tax_handler)
         graph.add_node("synthesizer", self._synthesize_response)
         
         # Add edges
@@ -86,13 +90,21 @@ class LegalAgentGraph:
             {
                 "constitutional": "constitutional_agent",
                 "criminal": "criminal_agent",
-                "synthesizer": "synthesizer"
+                "civil": "civil_agent",
+                "corporate": "corporate_agent",
+                "family": "family_agent",
+                "tax": "tax_agent",
+                "synthesizer": "synthesizer",
             }
         )
-        
+
         # All agents go to synthesizer
         graph.add_edge("constitutional_agent", "synthesizer")
         graph.add_edge("criminal_agent", "synthesizer")
+        graph.add_edge("civil_agent", "synthesizer")
+        graph.add_edge("corporate_agent", "synthesizer")
+        graph.add_edge("family_agent", "synthesizer")
+        graph.add_edge("tax_agent", "synthesizer")
         graph.add_edge("synthesizer", END)
         
         return graph.compile()
@@ -104,11 +116,19 @@ class LegalAgentGraph:
         
         # Simple keyword-based routing (can be enhanced with ML classification)
         domain = "general"
-        
+
         if any(word in latest_message.lower() for word in ["constitution", "fundamental rights", "article"]):
             domain = "constitutional"
         elif any(word in latest_message.lower() for word in ["crime", "criminal", "ipc", "murder", "theft"]):
             domain = "criminal"
+        elif any(word in latest_message.lower() for word in ["contract", "property", "tort", "civil"]):
+            domain = "civil"
+        elif any(word in latest_message.lower() for word in ["company", "shareholder", "corporate"]):
+            domain = "corporate"
+        elif any(word in latest_message.lower() for word in ["marriage", "divorce", "custody"]):
+            domain = "family"
+        elif any(word in latest_message.lower() for word in ["tax", "income tax", "gst"]):
+            domain = "tax"
         
         state["legal_domain"] = domain
         state["current_agent"] = domain
@@ -119,10 +139,16 @@ class LegalAgentGraph:
         """Decide which agent to route to"""
         domain = state.get("legal_domain", "general")
         
-        if domain in ["constitutional", "criminal"]:
+        if domain in [
+            "constitutional",
+            "criminal",
+            "civil",
+            "corporate",
+            "family",
+            "tax",
+        ]:
             return domain
-        else:
-            return "synthesizer"
+        return "synthesizer"
     
     def _constitutional_handler(self, state: LegalAgentState) -> LegalAgentState:
         """Handle constitutional law queries"""
@@ -151,7 +177,60 @@ class LegalAgentGraph:
         # Add AI response to messages
         ai_message = AIMessage(content=result["advice"])
         state["messages"].append(ai_message)
-        
+
+        return state
+
+    def _civil_handler(self, state: LegalAgentState) -> LegalAgentState:
+        """Handle civil law queries"""
+        agent = self.agents["civil"]
+        result = agent.process_query(state)
+
+        state["legal_advice"] = result["advice"]
+        state["confidence_score"] = result["confidence"]
+        state["citations"] = result["citations"]
+
+        ai_message = AIMessage(content=result["advice"])
+        state["messages"].append(ai_message)
+
+        return state
+
+    def _corporate_handler(self, state: LegalAgentState) -> LegalAgentState:
+        agent = self.agents["corporate"]
+        result = agent.process_query(state)
+
+        state["legal_advice"] = result["advice"]
+        state["confidence_score"] = result["confidence"]
+        state["citations"] = result["citations"]
+
+        ai_message = AIMessage(content=result["advice"])
+        state["messages"].append(ai_message)
+
+        return state
+
+    def _family_handler(self, state: LegalAgentState) -> LegalAgentState:
+        agent = self.agents["family"]
+        result = agent.process_query(state)
+
+        state["legal_advice"] = result["advice"]
+        state["confidence_score"] = result["confidence"]
+        state["citations"] = result["citations"]
+
+        ai_message = AIMessage(content=result["advice"])
+        state["messages"].append(ai_message)
+
+        return state
+
+    def _tax_handler(self, state: LegalAgentState) -> LegalAgentState:
+        agent = self.agents["tax"]
+        result = agent.process_query(state)
+
+        state["legal_advice"] = result["advice"]
+        state["confidence_score"] = result["confidence"]
+        state["citations"] = result["citations"]
+
+        ai_message = AIMessage(content=result["advice"])
+        state["messages"].append(ai_message)
+
         return state
     
     def _synthesize_response(self, state: LegalAgentState) -> LegalAgentState:
