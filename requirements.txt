@@ -8,3 +8,4 @@ openai
 python-multipart
 PyPDF2
 pytest
+httpx
