@@ -111,41 +111,139 @@ class CriminalLawAgent(BaseLegalAgent):
 class CivilLawAgent(BaseLegalAgent):
     def __init__(self, llm):
         super().__init__(llm, "civil")
-    
+
     def process_query(self, state: Dict[str, Any]) -> Dict[str, Any]:
-        return {"advice": "Civil law analysis", "citations": [], "confidence": 0.8}
+        messages = state["messages"]
+        latest_query = messages[-1].content if messages else ""
+
+        prompt = ChatPromptTemplate.from_messages([
+            (
+                "system",
+                """You are an expert in Indian Civil Law. Provide key statutes and case law relevant to the query.""",
+            ),
+            ("human", "{query}"),
+        ])
+        response = self.llm.invoke(prompt.format_messages(query=latest_query))
+
+        return {
+            "advice": response.content,
+            "citations": [],
+            "confidence": 0.8,
+        }
 
 class CorporateLawAgent(BaseLegalAgent):
     def __init__(self, llm):
         super().__init__(llm, "corporate")
-    
+
     def process_query(self, state: Dict[str, Any]) -> Dict[str, Any]:
-        return {"advice": "Corporate law analysis", "citations": [], "confidence": 0.8}
+        messages = state["messages"]
+        latest_query = messages[-1].content if messages else ""
+
+        prompt = ChatPromptTemplate.from_messages([
+            (
+                "system",
+                """You are an expert in Indian Corporate Law. Discuss relevant sections of the Companies Act and notable judgments.""",
+            ),
+            ("human", "{query}"),
+        ])
+
+        response = self.llm.invoke(prompt.format_messages(query=latest_query))
+
+        return {
+            "advice": response.content,
+            "citations": [],
+            "confidence": 0.8,
+        }
 
 class FamilyLawAgent(BaseLegalAgent):
     def __init__(self, llm):
         super().__init__(llm, "family")
-    
+
     def process_query(self, state: Dict[str, Any]) -> Dict[str, Any]:
-        return {"advice": "Family law analysis", "citations": [], "confidence": 0.8}
+        messages = state["messages"]
+        latest_query = messages[-1].content if messages else ""
+
+        prompt = ChatPromptTemplate.from_messages([
+            (
+                "system",
+                """You are an expert in Indian Family Law. Explain how personal laws apply to the query.""",
+            ),
+            ("human", "{query}"),
+        ])
+
+        response = self.llm.invoke(prompt.format_messages(query=latest_query))
+
+        return {
+            "advice": response.content,
+            "citations": [],
+            "confidence": 0.8,
+        }
 
 class TaxLawAgent(BaseLegalAgent):
     def __init__(self, llm):
         super().__init__(llm, "tax")
-    
+
     def process_query(self, state: Dict[str, Any]) -> Dict[str, Any]:
-        return {"advice": "Tax law analysis", "citations": [], "confidence": 0.8}
+        messages = state["messages"]
+        latest_query = messages[-1].content if messages else ""
+
+        prompt = ChatPromptTemplate.from_messages([
+            (
+                "system",
+                """You are an expert in Indian Taxation Law. Provide guidance using relevant sections of the Income Tax Act.""",
+            ),
+            ("human", "{query}"),
+        ])
+        response = self.llm.invoke(prompt.format_messages(query=latest_query))
+
+        return {
+            "advice": response.content,
+            "citations": [],
+            "confidence": 0.8,
+        }
 
 class LegalResearchAgent(BaseLegalAgent):
     def __init__(self, llm):
         super().__init__(llm, "research")
-    
+
     def process_query(self, state: Dict[str, Any]) -> Dict[str, Any]:
-        return {"advice": "Legal research analysis", "citations": [], "confidence": 0.8}
+        messages = state["messages"]
+        latest_query = messages[-1].content if messages else ""
+
+        prompt = ChatPromptTemplate.from_messages([
+            (
+                "system",
+                """You perform legal research across Indian case law and statutes. Provide concise findings.""",
+            ),
+            ("human", "{query}"),
+        ])
+        response = self.llm.invoke(prompt.format_messages(query=latest_query))
+
+        return {
+            "advice": response.content,
+            "citations": [],
+            "confidence": 0.8,
+        }
 
 class DocumentAnalysisAgent(BaseLegalAgent):
     def __init__(self, llm):
         super().__init__(llm, "document_analysis")
-    
+
     def process_query(self, state: Dict[str, Any]) -> Dict[str, Any]:
-        return {"advice": "Document analysis", "citations": [], "confidence": 0.8}
+        messages = state["messages"]
+        latest_query = messages[-1].content if messages else ""
+
+        prompt = ChatPromptTemplate.from_messages([
+            (
+                "system",
+                """You analyze uploaded legal documents. Summarize key points relevant to the query.""",
+            ),
+            ("human", "{query}"),
+        ])
+        response = self.llm.invoke(prompt.format_messages(query=latest_query))
+
+        return {
+            "advice": response.content,
+            "citations": [],
+            "confidence": 0.8,
+        }
